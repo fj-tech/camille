@@ -93,3 +93,57 @@ async function updateBoardNames() {
     
     return { success: true, processedCount };
 }
+document.getElementById("expandNotifications").addEventListener("click", () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0]?.id) {
+            chrome.scripting.executeScript({
+                target: { tabId: tabs[0].id },
+                func: expandNotificationsBar
+            }).catch((error) => {
+                console.error("Expand script failed:", error);
+            });
+        }
+    });
+});
+
+// This function runs in the context of the webpage
+function expandNotificationsBar() {    
+
+    const container = document.querySelector('.q2PzD_Dkq1FVX3');
+
+    if (!container || !container.parentNode) {
+        console.warn('Element with class "q2PzD_Dkq1FVX3" not found or not in DOM.');
+        return;
+    }
+
+    const parent = container.parentNode;
+    const nextSibling = container.nextSibling;
+
+    // Temporarily remove the element
+    parent.removeChild(container);
+
+    // Re-insert it after a short delay
+    setTimeout(() => {
+        if (nextSibling) {
+            parent.insertBefore(container, nextSibling);
+        } else {
+            parent.appendChild(container);
+        }
+
+ 
+        document.querySelectorAll('.rX4pAv5sWHFNjp').forEach(el => {
+            el.style.width = "1100px";
+        });
+        // Set width for all elements with these classes
+        document.querySelectorAll('.wLoWP69oEugrm2').forEach(el => {
+            el.style.width = "1000px";
+        });
+
+        document.querySelectorAll('.tPaQUcYdGYTWrf').forEach(el => {
+            el.style.width = "1000px";
+        });
+   
+
+        console.log("Notifications bar expanded.");
+    }, 100);
+}
